@@ -1,6 +1,6 @@
-# algae linked list
+# algae doubly linked list
 
-This package implements a simple circular linked list.
+This package implements a simple circular doubly linked list.
 
 The objective of this project is to describe the data structure and it's main operations.
 
