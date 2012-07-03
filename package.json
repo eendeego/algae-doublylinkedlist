@@ -1,0 +1,22 @@
+{
+  "author": "Luis Reis <luis@luismreis.com>",
+  "name": "algae-doublylinkedlist",
+  "description": "Algorithms for JS - Doubly Linked List",
+  "version": "0.0.0",
+  "repository": {
+    "url": ""
+  },
+  "engines": {
+    "node": ">= 0.6.0"
+  },
+  "main": "./list",
+  "dependencies": {},
+  "devDependencies": {
+    "tap": "*",
+    "uglify-js": "*"
+  },
+  "scripts": {
+    "test": "node node_modules/tap/bin/tap.js tests",
+    "minify": "node node_modules/uglify-js/bin/uglifyjs < list.js > list.min.js"
+  }
+}
