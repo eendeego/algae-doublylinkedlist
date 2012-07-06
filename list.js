@@ -4,8 +4,15 @@
 
 // http://caolanmcmahon.com/posts/writing_for_node_and_the_browser
 (function(exports) {
+  function isArray(o) {
+    return Object.prototype.toString.apply(o) === '[object Array]';
+  }
 
-  exports.create = function create(array) {
+  function isList(o) {
+    return o.isList && o.isList();
+  }
+
+  function create(initializer) {
     var head = null;
     var size = 0;
 
@@ -13,6 +20,8 @@
       isEmpty : null,
       size : null,
       length : null,
+      isArray : null,
+      isList : null,
       toArray : null,
       toReverseArray : null,
       push : null,
@@ -36,6 +45,14 @@
       return size;
     };
     Object.defineProperty(list, 'length', { get: list.size });
+
+    list.isArray = function() {
+      return false;
+    }
+
+    list.isList = function() {
+      return true;
+    }
 
     list.toArray = function() {
       var result = new Array(size);
@@ -147,6 +164,87 @@
       return this;
     };
 
+    list.splice = function(index, howMany, newElements) {
+      var result;
+
+      if (howMany === 0 || index >= size) {
+        result = create();
+
+        if (newElements === undefined) {
+          return result;
+        }
+
+        if ((isArray(newElements) || isList(newElements)) &&
+            newElements.length === 0) {
+          return result;
+        }
+      }
+
+      if (size === 0) {
+        if (newElements !== undefined) {
+          list.concat(newElements);
+        }
+        return create();
+      }
+
+      var bucket = head;
+      var i = 0;
+      if (index > 0) {
+        do {
+          bucket = bucket.next;
+          i++;
+        } while(i < index && bucket !== head);
+      } else if (index < 0) {
+        do {
+          bucket = bucket.previous;
+          i--;
+        } while(i > index && bucket !== head);
+      }
+
+      var resultHead = i === size ? null : bucket;
+
+      var previous = bucket.previous;
+      if (howMany !== 0) {
+        var resultSize;
+        if (howMany === undefined) {
+          bucket = head;
+          resultSize = size-i;
+        } else {
+          i = 0;
+          do {
+            bucket = bucket.next;
+            i++;
+          } while(i < howMany && bucket !== head);
+          resultSize = i;
+        }
+
+        if (resultHead !== null) {
+          bucket.previous.next = resultHead;
+          resultHead.previous = bucket.previous;
+        }
+
+        result = createFromBucketChain(resultHead, resultSize);
+
+        size -= resultSize;
+      }
+
+      if (newElements !== undefined) {
+        newElements.forEach(function(e) {
+          previous.next = { previous: previous, next: null, target: e };
+          previous = previous.next;
+        });
+        size += newElements.length;
+      }
+      bucket.previous = previous;
+      previous.next = bucket;
+
+      if (index === 0) {
+        head = bucket;
+      }
+
+      return result;
+    }
+
     list.concat = function(suffix) {
       if (suffix.length === 0) {
         return this;
@@ -254,10 +352,51 @@
       } while (bucket.next !== head);
     };
 
-    if (array !== undefined && array.length > 0) {
-      list.concat(array);
+    if (initializer !== undefined) {
+      var initialData = initializer(list);
+
+      head = initialData.head;
+      if (head !== null) {
+        size = initialData.size;
+        if (size === undefined) {
+          size = 1;
+          for (var bucket = head.next; bucket !== head; bucket = bucket.next, size++) ;
+        }
+      }
     }
 
     return list;
+  }
+
+  function arrayToBucketChain(array) {
+    if (array.length === 0) {
+      return null;
+    }
+
+    var head = { previous: null, next: null, target: array[0] };
+    var bucket = head;
+    for(var i=1; i<array.length; i++) {
+      bucket.next = { previous: bucket, next: null, target: array[i] };
+      bucket = bucket.next;
+    }
+
+    head.previous = bucket;
+    bucket.next = head;
+
+    return head;
+  }
+
+  function createFromBucketChain(head, size) {
+    return create(function (list) {
+      return { head: head, size: size };
+    });
+  }
+
+  exports.create = function(array) {
+    if (array === undefined || array.length === 0) {
+      return create();
+    } else {
+      return createFromBucketChain(arrayToBucketChain(array));
+    }
   };
 })(typeof exports === 'undefined' ? this['algaeDoublyLinkedList']={} : exports);

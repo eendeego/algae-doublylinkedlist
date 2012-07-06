@@ -1,5 +1,5 @@
 var tap  = require('tap');
-var ll = require('../list')
+var ll = require('../list');
 
 tap.test("new linked list is empty", function(t) {
   var list = ll.create();
@@ -14,7 +14,7 @@ tap.test("new linked list is empty", function(t) {
 
 tap.test("creating a list with an array", function(t) {
   var list;
-  
+
   list = ll.create([]);
   t.equal     (list.isEmpty()       , true);
   t.equivalent(list.toArray()       , []  );
@@ -140,17 +140,114 @@ tap.test("reversing a list", function(t) {
   t.end();
 });
 
+tap.test("splicing a list", function(t) {
+  var testArrays = [[], [1], [1, 2], [1, 2, 3], [1, 2, 3, 4]];
+  var i;
+
+  // Positive index
+  testArrays.forEach(function(array) {
+    var sourceList   = ll.create(array);
+    var splicedList  = sourceList.splice(1, 2);
+    var sourceArray  = array.slice(0);
+    var splicedArray = sourceArray.splice(1, 2);
+
+    t.equivalent(sourceList.toArray(),
+                 sourceArray,
+                 '[' + array.toString() + '].splice(1, 2) (source)');
+    t.equivalent(splicedList.toArray(),
+                 splicedArray,
+                 '[' + array.toString() + '].splice(1, 2)');
+  });
+
+  // Negative index
+  testArrays.forEach(function(array) {
+    var sourceList   = ll.create(array);
+    var splicedList  = sourceList.splice(-2, 2);
+    var sourceArray  = array.slice(0);
+    var splicedArray = sourceArray.splice(-2, 2);
+
+    t.equivalent(sourceList.toArray(),
+                 sourceArray,
+                 '[' + array.toString() + '].splice(-2, 2) (source)');
+    t.equivalent(splicedList.toArray(),
+                 splicedArray,
+                 '[' + array.toString() + '].splice(-2, 2)');
+  });
+
+  // Truncating
+  testArrays.forEach(function(array) {
+    var sourceList   = ll.create(array);
+    var splicedList  = sourceList.splice(1);
+    var sourceArray  = array.slice(0);
+    var splicedArray = sourceArray.splice(1);
+
+    t.equivalent(sourceList.toArray(),
+                 sourceArray,
+                 '[' + array.toString() + '].splice(1) (source)');
+    t.equivalent(splicedList.toArray(),
+                 splicedArray,
+                 '[' + array.toString() + '].splice(1)');
+  });
+
+  // Inserting (arrays)
+  testArrays.forEach(function(array) {
+    var sourceList   = ll.create(array);
+    var splicedList  = sourceList.splice(1, 0, [5, 6, 7]);
+    var sourceArray  = array.slice(0);
+    var splicedArray = sourceArray.splice(1, 0, 5, 6, 7);
+
+    t.equivalent(sourceList.toArray(),
+                 sourceArray,
+                 '[' + array.toString() + '].splice(1, 0, [5, 6, 7]) (source)');
+    t.equivalent(splicedList.toArray(),
+                 splicedArray,
+                 '[' + array.toString() + '].splice(1, 0, [5, 6, 7])');
+  });
+
+  // Inserting (lists)
+  testArrays.forEach(function(array) {
+    var sourceList   = ll.create(array);
+    var splicedList  = sourceList.splice(1, 0, ll.create([5, 6, 7]));
+    var sourceArray  = array.slice(0);
+    var splicedArray = sourceArray.splice(1, 0, 5, 6, 7);
+
+    t.equivalent(sourceList.toArray(),
+                 sourceArray,
+                 '[' + array.toString() + '].splice(1, 0, ll.create([5, 6, 7])) (source)');
+    t.equivalent(splicedList.toArray(),
+                 splicedArray,
+                 '[' + array.toString() + '].splice(1, 0, ll.create([5, 6, 7]))');
+  });
+
+  // Replacing
+  testArrays.forEach(function(array) {
+    var sourceList   = ll.create(array);
+    var splicedList  = sourceList.splice(1, 2, [5, 6, 7]);
+    var sourceArray  = array.slice(0);
+    var splicedArray = sourceArray.splice(1, 2, 5, 6, 7);
+
+    t.equivalent(sourceList.toArray(),
+                 sourceArray,
+                 '[' + array.toString() + '].splice(1, 2, [5, 6, 7]) (source)');
+    t.equivalent(splicedList.toArray(),
+                 splicedArray,
+                 '[' + array.toString() + '].splice(1, 2, [5, 6, 7])');
+  });
+
+  t.end();
+});
+
 tap.test("concatenating lists", function(t) {
   t.equivalent(ll.create([]    ).concat(ll.create([]    )).toArray(),
-               []);
+               [], 'Concatenate empty lists');
   t.equivalent(ll.create([]    ).concat(ll.create([1]   )).toArray(),
-               [1]);
+               [1], 'Concatenate an empty list with a filled one');
   t.equivalent(ll.create([1]   ).concat(ll.create([]    )).toArray(),
-               [1]);
+               [1], 'Concatenate with an empty list');
   t.equivalent(ll.create([1]   ).concat(ll.create([2]   )).toArray(),
-               [1, 2]);
+               [1, 2] , 'Concatenate two single element lists');
   t.equivalent(ll.create([1, 2]).concat(ll.create([3, 4])).toArray(),
-               [1, 2, 3, 4]);
+               [1, 2, 3, 4] , 'Concatenate two more-than-one element lists');
 
   t.end();
 });
