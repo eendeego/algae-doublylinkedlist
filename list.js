@@ -31,7 +31,9 @@
       reverse : null,
       splice : null,
       concat : null,
+      concatM : null,
       prepend : null,
+      prependM : null,
       join : null,
       forEach : null,
       reverseForEach : null
@@ -182,7 +184,7 @@
 
       if (size === 0) {
         if (newElements !== undefined) {
-          list.concat(newElements);
+          list.concatM(newElements);
         }
         return create();
       }
@@ -246,10 +248,14 @@
     }
 
     list.concat = function(suffix) {
-      if (suffix.length === 0) {
-        return this;
-      }
+      var newList = createFromBucketChain(duplicateBucketChain(head), size);
 
+      newList.concatM(suffix);
+
+      return newList;
+    };
+
+    list.concatM = function(suffix) {
       suffix.forEach(function(e) {
         list.push(e);
       });
@@ -258,13 +264,20 @@
     };
 
     list.prepend = function(prefix) {
-      if (prefix.length === 0) {
-        return this;
-      }
+      var newList = createFromBucketChain(duplicateBucketChain(head), size);
 
-      prefix.reverseForEach(function(e) {
-        list.unshift(e);
-      });
+      newList.prependM(prefix);
+
+      return newList;
+    };
+
+    list.prependM = function(prefix) {
+      list.concatM(prefix);
+
+      // LATER Replace with rotateRight(prefix.length)
+      for(var i=prefix.length; i>0; i--) {
+        head = head.previous;
+      }
 
       return this;
     };
@@ -384,6 +397,24 @@
     bucket.next = head;
 
     return head;
+  }
+
+  function duplicateBucketChain(head) {
+    if (head === null) {
+      return null;
+    }
+
+    var newHead = { previous: null, next: null, target: head.target };
+    var newBucket = newHead;
+    for(var bucket = head.next; bucket != head; bucket = bucket.next) {
+      newBucket.next = { previous: newBucket, next: null, target: bucket.target };
+      newBucket = newBucket.next;
+    }
+
+    newHead.previous = newBucket;
+    newBucket.next = newHead;
+
+    return newHead;
   }
 
   function createFromBucketChain(head, size) {

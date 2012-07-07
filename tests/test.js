@@ -238,36 +238,99 @@ tap.test("splicing a list", function(t) {
 });
 
 tap.test("concatenating lists", function(t) {
-  t.equivalent(ll.create([]    ).concat(ll.create([]    )).toArray(),
-               [], 'Concatenate empty lists');
-  t.equivalent(ll.create([]    ).concat(ll.create([1]   )).toArray(),
-               [1], 'Concatenate an empty list with a filled one');
-  t.equivalent(ll.create([1]   ).concat(ll.create([]    )).toArray(),
-               [1], 'Concatenate with an empty list');
-  t.equivalent(ll.create([1]   ).concat(ll.create([2]   )).toArray(),
-               [1, 2] , 'Concatenate two single element lists');
-  t.equivalent(ll.create([1, 2]).concat(ll.create([3, 4])).toArray(),
-               [1, 2, 3, 4] , 'Concatenate two more-than-one element lists');
+  var testArrays = [[[],[]], [[],[1]], [[1],[]], [[1],[2]], [[1,2],[3,4]]];
+  var i;
+
+  testArrays.forEach(function(a) {
+    var sourceList  = ll.create(a[0]);
+    var concatList  = sourceList.concat(ll.create(a[1]));
+    var sourceArray = a[0].slice(0);
+    var concatArray = sourceArray.concat(a[1]);
+
+    t.equivalent(sourceList.toArray(), sourceArray,
+                 '[' + a[0].toString() + '].concat(' + a[1].toString() + ') (source)');
+    t.equivalent(concatList.toArray(), concatArray,
+                 '[' + a[0].toString() + '].concat(' + a[1].toString() + ')');
+  });
 
   t.end();
 });
 
-tap.test("concatenating lists with arrays", function(t) {
-  t.equivalent(ll.create([]    ).concat([]    ).toArray(), []);
-  t.equivalent(ll.create([]    ).concat([1]   ).toArray(), [1]);
-  t.equivalent(ll.create([1]   ).concat([]    ).toArray(), [1]);
-  t.equivalent(ll.create([1]   ).concat([2]   ).toArray(), [1, 2]);
-  t.equivalent(ll.create([1, 2]).concat([3, 4]).toArray(), [1, 2, 3, 4]);
+tap.test("concatenating lists with Modification", function(t) {
+  var testArrays = [[[],[],[]], [[],[1],[1]], [[1],[],[1]],
+                    [[1],[2],[1,2]], [[1,2],[3,4],[1,2,3,4]]];
+  var i;
+
+  testArrays.forEach(function(a) {
+    var sourceList  = ll.create(a[0]).concatM(ll.create(a[1]));
+
+    t.equivalent(sourceList.toArray(), a[2],
+                 '[' + a[0].toString() + '].concatM(' + a[1].toString() + ')');
+  });
+
+  t.end();
+});
+
+tap.test("concatenating lists with arrays with Modification", function(t) {
+  var testArrays = [[[],[],[]], [[],[1],[1]], [[1],[],[1]],
+                    [[1],[2],[1,2]], [[1,2],[3,4],[1,2,3,4]]];
+  var i;
+
+  testArrays.forEach(function(a) {
+    var sourceList  = ll.create(a[0]).concatM(a[1]);
+
+    t.equivalent(sourceList.toArray(), a[2],
+                 '[' + a[0].toString() + '].concatM(' + a[1].toString() + ')');
+  });
 
   t.end();
 });
 
 tap.test("prepending lists", function(t) {
-  t.equivalent(ll.create([]).prepend(ll.create([])).toArray(), []);
-  t.equivalent(ll.create([]).prepend(ll.create([1])).toArray(), [1]);
-  t.equivalent(ll.create([1]).prepend(ll.create([])).toArray(), [1]);
-  t.equivalent(ll.create([1]).prepend(ll.create([2])).toArray(), [2, 1]);
-  t.equivalent(ll.create([1, 2]).prepend(ll.create([3, 4])).toArray(), [3, 4, 1, 2]);
+  var testArrays = [[[],[],[]], [[],[1],[1]], [[1],[],[1]],
+                    [[1],[2],[2,1]], [[1,2],[3,4],[3,4,1,2]]];
+  var i;
+
+  testArrays.forEach(function(a) {
+    var sourceList  = ll.create(a[0]);
+    var prependList = sourceList.prepend(ll.create(a[1]));
+
+    t.equivalent(sourceList.toArray(), a[0],
+                 '[' + a[0].toString() + '].prepend(' + a[1].toString() + ') (source)');
+    t.equivalent(prependList.toArray(), a[2],
+                 '[' + a[0].toString() + '].prepend(' + a[1].toString() + ')');
+  });
+
+  t.end();
+});
+
+tap.test("prepending lists with Modification", function(t) {
+  var testArrays = [[[],[],[]], [[],[1],[1]], [[1],[],[1]],
+                    [[1],[2],[2,1]], [[1,2],[3,4],[3,4,1,2]]];
+  var i;
+
+  testArrays.forEach(function(a) {
+    var sourceList  = ll.create(a[0]).prependM(ll.create(a[1]));
+
+    t.equivalent(sourceList.toArray(), a[2],
+                 '[' + a[0].toString() + '].prependM(' + a[1].toString() + ')');
+  });
+
+  t.end();
+});
+
+tap.test("prepending lists with arrays with Modification", function(t) {
+  var testArrays = [[[],[],[]], [[],[1],[1]], [[1],[],[1]],
+                    [[1],[2],[2,1]], [[1,2],[3,4],[3,4,1,2]]];
+  var i;
+
+  testArrays.forEach(function(a) {
+    var sourceList  = ll.create(a[0]).prependM(a[1]);
+
+    t.equivalent(sourceList.toArray(), a[2],
+                 '[' + a[0].toString() + '].prependM(' + a[1].toString() + ')');
+  });
+
   t.end();
 });
 
