@@ -17,26 +17,55 @@
     var size = 0;
 
     var list = {
+      // Properties
       isEmpty : null,
       size : null,
       length : null,
+
       isArray : null,
       isList : null,
-      toArray : null,
-      toReverseArray : null,
+
+      // Mutator methods
       push : null,
       pop : null,
       unshift : null,
       shift : null,
+
       reverse : null,
       splice : null,
-      concat : null,
+
       concatM : null,
-      prepend : null,
       prependM : null,
+
+      rotateLeft : null, // TODO
+      rotateRight : null, // TODO
+
+      // Accessor methods
+      concat : null,
+      prepend : null,
+
+      indexOf : null, // TODO
+      lastIndexOf : null, // TODO
+
+      slice : null, // TODO
+      toArray : null,
+      toReverseArray : null,
+
       join : null,
+      toString : null, // TODO
+
+      // Iteration methods
       forEach : null,
       reverseForEach : null
+
+      map : null, // TODO
+      reduce : null, // TODO
+      reduceRight : null, // TODO
+
+      some : null, // TODO
+      every : null, // TODO
+
+      filter : null, // TODO
     };
 
     list.isEmpty = function() {
