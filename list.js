@@ -37,8 +37,8 @@
       concatM : null,
       prependM : null,
 
-      rotateLeft : null, // TODO
-      rotateRight : null, // TODO
+      rotateLeft : null,
+      rotateRight : null,
 
       // Accessor methods
       concat : null,
@@ -56,7 +56,7 @@
 
       // Iteration methods
       forEach : null,
-      reverseForEach : null
+      reverseForEach : null,
 
       map : null, // TODO
       reduce : null, // TODO
@@ -65,7 +65,7 @@
       some : null, // TODO
       every : null, // TODO
 
-      filter : null, // TODO
+      filter : null // TODO
     };
 
     list.isEmpty = function() {
@@ -301,15 +301,24 @@
     };
 
     list.prependM = function(prefix) {
-      list.concatM(prefix);
-
-      // LATER Replace with rotateRight(prefix.length)
-      for(var i=prefix.length; i>0; i--) {
-        head = head.previous;
-      }
+      list.concatM(prefix).rotateRight(prefix.length);
 
       return this;
     };
+
+    list.rotateLeft = function(positions) {
+      for(positions = positions % size; positions>0; positions--) {
+        head = head.next;
+      }
+      return this;
+    }
+
+    list.rotateRight = function(positions) {
+      for(positions = positions % size; positions>0; positions--) {
+        head = head.previous;
+      }
+      return this;
+    }
 
     list.join = function(separator) {
       if (size === 0) {

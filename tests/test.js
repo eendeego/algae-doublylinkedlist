@@ -334,6 +334,38 @@ tap.test("prepending lists with arrays with Modification", function(t) {
   t.end();
 });
 
+tap.test("rotating lists to the left", function(t) {
+  var testArrays = [[[],2,[]], [[1],1,[1]],
+                    [[1,2],1,[2,1]], [[1,2],2,[1,2]], [[1,2],3,[2,1]],
+                    [[1,2,3],1,[2,3,1]], [[1,2,3],2,[3,1,2]], [[1,2,3],3,[1,2,3]]];
+  var i;
+
+  testArrays.forEach(function(a) {
+    var list  = ll.create(a[0]).rotateLeft(a[1]);
+
+    t.equivalent(list.toArray(), a[2],
+                 '[' + a[0].toString() + '].rotate(' + a[1].toString() + ')');
+  });
+
+  t.end();
+});
+
+tap.test("rotating lists to the right", function(t) {
+  var testArrays = [[[],2,[]], [[1],1,[1]],
+                    [[1,2],1,[2,1]], [[1,2],2,[1,2]], [[1,2],3,[2,1]],
+                    [[1,2,3],1,[3,1,2]], [[1,2,3],2,[2,3,1]], [[1,2,3],3,[1,2,3]]];
+  var i;
+
+  testArrays.forEach(function(a) {
+    var list  = ll.create(a[0]).rotateRight(a[1]);
+
+    t.equivalent(list.toArray(), a[2],
+                 '[' + a[0].toString() + '].rotate(' + a[1].toString() + ')');
+  });
+
+  t.end();
+});
+
 tap.test("joining a list", function(t) {
   t.equivalent(ll.create([]).join("-"), "");
   var x = ll.create([1]);
