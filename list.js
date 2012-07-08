@@ -477,17 +477,14 @@
         separator = ",";
       }
 
-      var buffer = "";
+      var buffer = new Array(size);
 
       list.forEach(function(e, i) {
-        if (i > 0) {
-          buffer = buffer + separator;
-        }
-        buffer = buffer + e;
+        buffer[i] = e;
       });
 
-      return buffer;
-    }
+      return buffer.join(separator);
+    };
 
     list.forEach = function(callback, thisArg) {
       // @see https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/forEach
