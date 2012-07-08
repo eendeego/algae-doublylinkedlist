@@ -366,6 +366,59 @@ tap.test("rotating lists to the right", function(t) {
   t.end();
 });
 
+tap.test("finding an element", function(t) {
+  var testArrays = [[[],2,undefined], [[1],1, 0], [[1], 1, -1],
+                    [[1,2],1,undefined], [[1,2],2,0], [[1,2],3,3],
+                    [[1,2],3,-1], [[1,2],3,-3],
+                    [[1,2,3],1], [[1,2,3],2,-1], [[1,2,3],2,-2],
+                    [[1,2,3],3,undefined]];
+  var i;
+
+  testArrays.forEach(function(a) {
+    var position = ll.create(a[0]).indexOf(a[1], a[2]);
+
+    t.equivalent(position, a[0].indexOf(a[1], a[2]),
+                 '[' + a[0].toString() + '].indexOf(' + a[1] + ',' + a[2] + ')');
+  });
+
+  t.end();
+});
+
+tap.test("finding an element (right to left)", function(t) {
+  var testArrays = [[[],2,undefined], [[1],1, 0], [[1], 1, -1],
+                    [[1,2],1,undefined], [[1,2],2,0], [[1,2],3,3],
+                    [[1,2],3,-1], [[1,2],3,-3],
+                    [[1,2,3],1], [[1,2,3],2,-1], [[1,2,3],2,-2],
+                    [[1,2,3],3,undefined]];
+  var i;
+
+  testArrays.forEach(function(a) {
+    var position = ll.create(a[0]).lastIndexOf(a[1], a[2]);
+
+    t.equivalent(position, a[0].lastIndexOf(a[1], a[2]),
+                 '[' + a[0].toString() + '].lastIndexOf(' + a[1] + ',' + a[2] + ')');
+  });
+
+  t.end();
+});
+
+tap.test("slicin'n'dicin", function(t) {
+  var testArrays = [[[],-1], [[],1], [[1], 1],
+                    [[1,2],1], [[1,2],2], [[1,2],3],
+                    [[1,2],-1], [[1,2],-3],
+                    [[1,2,3],1], [[1,2,3],-1], [[1,2,3],-2],
+                    [[1,2,3],3], [[1,2,3],1,3], [[1,2,3],-3,3]];
+
+  testArrays.forEach(function(a) {
+    var slice = ll.create(a[0]).slice(a[1], a[2]);
+
+    t.equivalent(slice.toArray(), a[0].slice(a[1], a[2]),
+                 '[' + a[0].toString() + '].slice(' + a[1] + ',' + a[2] + ')');
+  });
+
+  t.end();
+});
+
 tap.test("joining a list", function(t) {
   t.equivalent(ll.create([]).join("-"), "");
   var x = ll.create([1]);

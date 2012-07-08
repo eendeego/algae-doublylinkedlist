@@ -44,10 +44,10 @@
       concat : null,
       prepend : null,
 
-      indexOf : null, // TODO
-      lastIndexOf : null, // TODO
+      indexOf : null,
+      lastIndexOf : null,
 
-      slice : null, // TODO
+      slice : null,
       toArray : null,
       toReverseArray : null,
 
@@ -319,6 +319,154 @@
       }
       return this;
     }
+
+    list.indexOf = function(searchElement, fromIndex) {
+      if (size === 0) {
+        return -1;
+      }
+
+      var n = fromIndex;
+      if (n === undefined || n != n) {
+        n = 0;
+      } else if (n != 0 && n != Infinity && n != -Infinity) {  
+        n = (n > 0 || -1) * Math.floor(Math.abs(n));  
+      }
+
+      if (n < 0) {
+        n = size + n;
+      }
+
+      if (n >= size || n < 0) {
+        return -1;
+      }
+
+      var bucket = head;
+      var k;
+      if (n < size / 2) {
+        k = 0;
+        while (k < n) {
+          bucket = bucket.next;
+          k++;
+        }
+      } else {
+        k = size;
+        do {
+          bucket = bucket.previous;
+          k--;
+        } while (k > size + n);
+      }
+
+      do {
+        if (bucket.target === searchElement) {
+          return k;
+        }
+        bucket = bucket.next;
+        k++;
+      } while (k < size);
+
+      return -1;  
+    };
+
+    list.lastIndexOf = function(searchElement, fromIndex) {
+      if (size === 0) {
+        return -1;
+      }
+
+      var n = fromIndex;
+      if (n === undefined || n != n) {
+        n = 0;
+      } else if (n != 0 && n != Infinity && n != -Infinity) {  
+        n = (n > 0 || -1) * Math.floor(Math.abs(n));  
+      }
+
+      if (n < 0) {
+        n = size + n;
+      }
+
+      if (n >= size || n < 0) {
+        return -1;
+      }
+
+      var bucket = head;
+      var k;
+      if (n < size / 2) {
+        k = 0;
+        while (k < n) {
+          bucket = bucket.next;
+          k++;
+        }
+      } else {
+        k = size;
+        do {
+          bucket = bucket.previous;
+          k--;
+        } while (k > size + n);
+      }
+
+      do {
+        if (bucket.target === searchElement) {
+          return k;
+        }
+        bucket = bucket.previous;
+        k--;
+      } while (k >= 0);
+
+      return -1;  
+    };
+
+    list.slice = function(begin, end) {
+      if (size === 0) {
+        return create();
+      }
+
+      if (begin < 0) {
+        begin = size + begin;
+        if (begin < 0) {
+          begin = 0
+        }
+      }
+
+      if (end === undefined) {
+        end = size;
+      }
+
+      if (begin >= size || begin < 0 || begin === end) {
+        return create();
+      }
+
+      if (begin === 0 && end === size) {
+        return createFromBucketChain(duplicateBucketChain(head), size);
+      }
+
+      var bucket = head;
+      var k;
+      if (begin < size / 2) {
+        k = 0;
+        while (k < begin) {
+          bucket = bucket.next;
+          k++;
+        }
+      } else {
+        k = size;
+        do {
+          bucket = bucket.previous;
+          k--;
+        } while (k > begin);
+      }
+
+      var newHead = { previous: null, next : null, target: bucket.target };
+      var newBucket = newHead;
+      for (k++; k < end; k++) {
+        bucket = bucket.next;
+        newBucket.next = { previous: newBucket, next: null, target: bucket.target };
+        newBucket = newBucket.next;
+      }
+
+      newHead.previous = newBucket;
+      newBucket.next = newHead;
+
+      return createFromBucketChain(newHead, end - begin);
+    };
 
     list.join = function(separator) {
       if (size === 0) {
