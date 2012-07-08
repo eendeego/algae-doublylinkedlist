@@ -430,6 +430,20 @@ tap.test("joining a list", function(t) {
   t.end();
 });
 
+tap.test("converting to string", function(t) {
+  var testArrays = [[], [1, 2], [1, 2, 3],
+                    [1, 'a string'], [1, 'a string', { key: 'value'}]];
+
+  testArrays.forEach(function(a) {
+    var string = ll.create(a).toString();
+
+    t.equivalent(string, a.toString(),
+                 '[' + a.toString() + '].toString()');
+  });
+
+  t.end();
+});
+
 tap.test("iterating over a list", function(t) {
   var list = ll.create([1, 2, 3]);
   var iterationSequence = [1, 2, 3];

@@ -52,7 +52,7 @@
       toReverseArray : null,
 
       join : null,
-      toString : null, // TODO
+      toString : null,
 
       // Iteration methods
       forEach : null,
@@ -484,6 +484,10 @@
       });
 
       return buffer.join(separator);
+    };
+
+    list.toString = function() {
+      return list.join(',');
     };
 
     list.forEach = function(callback, thisArg) {
