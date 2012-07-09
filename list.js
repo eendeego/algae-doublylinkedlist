@@ -2,14 +2,54 @@
 
 "use strict";
 
+/*jslint indent: 2, plusplus: true, vars: true */
+
 // http://caolanmcmahon.com/posts/writing_for_node_and_the_browser
-(function(exports) {
+(function (exports) {
   function isArray(o) {
     return Object.prototype.toString.apply(o) === '[object Array]';
   }
 
   function isList(o) {
     return o.isList && o.isList();
+  }
+
+  function arrayToBucketChain(array) {
+    if (array.length === 0) {
+      return null;
+    }
+
+    var head = { previous: null, next: null, target: array[0] };
+    var bucket = head;
+    var i;
+    for (i = 1; i < array.length; i++) {
+      bucket.next = { previous: bucket, next: null, target: array[i] };
+      bucket = bucket.next;
+    }
+
+    head.previous = bucket;
+    bucket.next = head;
+
+    return head;
+  }
+
+  function duplicateBucketChain(head) {
+    if (head === null) {
+      return null;
+    }
+
+    var bucket;
+    var newHead = { previous: null, next: null, target: head.target };
+    var newBucket = newHead;
+    for (bucket = head.next; bucket !== head; bucket = bucket.next) {
+      newBucket.next = { previous: newBucket, next: null, target: bucket.target };
+      newBucket = newBucket.next;
+    }
+
+    newHead.previous = newBucket;
+    newBucket.next = newHead;
+
+    return newHead;
   }
 
   function create(initializer) {
@@ -68,24 +108,24 @@
       filter : null // TODO
     };
 
-    list.isEmpty = function() {
+    list.isEmpty = function () {
       return size === 0;
     };
 
-    list.size = function() {
+    list.size = function () {
       return size;
     };
     Object.defineProperty(list, 'length', { get: list.size });
 
-    list.isArray = function() {
+    list.isArray = function () {
       return false;
-    }
+    };
 
-    list.isList = function() {
+    list.isList = function () {
       return true;
-    }
+    };
 
-    list.toArray = function() {
+    list.toArray = function () {
       var result = new Array(size);
       if (size) {
         var bucket = head;
@@ -93,12 +133,12 @@
         do {
           result[idx++] = bucket.target;
           bucket = bucket.next;
-        } while(bucket !== head);
+        } while (bucket !== head);
       }
       return result;
     };
 
-    list.toReverseArray = function() {
+    list.toReverseArray = function () {
       var result = new Array(size);
       if (size) {
         var bucket = head;
@@ -106,12 +146,12 @@
         do {
           bucket = bucket.previous;
           result[idx++] = bucket.target;
-        } while(bucket !== head);
+        } while (bucket !== head);
       }
       return result;
     };
 
-    list.push = function(element) {
+    list.push = function (element) {
       if (size === 0) {
         head = { previous: null, next: null, target: element };
         head.next = head.previous = head;
@@ -123,7 +163,7 @@
       size++;
     };
 
-    list.pop = function() {
+    list.pop = function () {
       if (size === 0) {
         return undefined;
       }
@@ -143,7 +183,7 @@
       return tail.target;
     };
 
-    list.unshift = function(element) {
+    list.unshift = function (element) {
       if (size === 0) {
         head = { previous: null, next: null, target: element };
         head.next = head.previous = head;
@@ -155,7 +195,7 @@
       }
     };
 
-    list.shift = function() {
+    list.shift = function () {
       if (size === 0) {
         return undefined;
       }
@@ -176,7 +216,7 @@
       return oldHead.target;
     };
 
-    list.reverse = function() {
+    list.reverse = function () {
       if (size <= 1) { // Nothing to do
         return this;
       }
@@ -195,7 +235,7 @@
       return this;
     };
 
-    list.splice = function(index, howMany, newElements) {
+    list.splice = function (index, howMany, newElements) {
       var result;
 
       if (howMany === 0 || index >= size) {
@@ -224,12 +264,12 @@
         do {
           bucket = bucket.next;
           i++;
-        } while(i < index && bucket !== head);
+        } while (i < index && bucket !== head);
       } else if (index < 0) {
         do {
           bucket = bucket.previous;
           i--;
-        } while(i > index && bucket !== head);
+        } while (i > index && bucket !== head);
       }
 
       var resultHead = i === size ? null : bucket;
@@ -239,13 +279,13 @@
         var resultSize;
         if (howMany === undefined) {
           bucket = head;
-          resultSize = size-i;
+          resultSize = size - i;
         } else {
           i = 0;
           do {
             bucket = bucket.next;
             i++;
-          } while(i < howMany && bucket !== head);
+          } while (i < howMany && bucket !== head);
           resultSize = i;
         }
 
@@ -260,7 +300,7 @@
       }
 
       if (newElements !== undefined) {
-        newElements.forEach(function(e) {
+        newElements.forEach(function (e) {
           previous.next = { previous: previous, next: null, target: e };
           previous = previous.next;
         });
@@ -274,9 +314,9 @@
       }
 
       return result;
-    }
+    };
 
-    list.concat = function(suffix) {
+    list.concat = function (suffix) {
       var newList = createFromBucketChain(duplicateBucketChain(head), size);
 
       newList.concatM(suffix);
@@ -284,15 +324,15 @@
       return newList;
     };
 
-    list.concatM = function(suffix) {
-      suffix.forEach(function(e) {
+    list.concatM = function (suffix) {
+      suffix.forEach(function (e) {
         list.push(e);
       });
 
       return this;
     };
 
-    list.prepend = function(prefix) {
+    list.prepend = function (prefix) {
       var newList = createFromBucketChain(duplicateBucketChain(head), size);
 
       newList.prependM(prefix);
@@ -300,36 +340,36 @@
       return newList;
     };
 
-    list.prependM = function(prefix) {
+    list.prependM = function (prefix) {
       list.concatM(prefix).rotateRight(prefix.length);
 
       return this;
     };
 
-    list.rotateLeft = function(positions) {
-      for(positions = positions % size; positions>0; positions--) {
+    list.rotateLeft = function (positions) {
+      for (positions = positions % size; positions > 0; positions--) {
         head = head.next;
       }
       return this;
-    }
+    };
 
-    list.rotateRight = function(positions) {
-      for(positions = positions % size; positions>0; positions--) {
+    list.rotateRight = function (positions) {
+      for (positions = positions % size; positions > 0; positions--) {
         head = head.previous;
       }
       return this;
-    }
+    };
 
-    list.indexOf = function(searchElement, fromIndex) {
+    list.indexOf = function (searchElement, fromIndex) {
       if (size === 0) {
         return -1;
       }
 
       var n = fromIndex;
-      if (n === undefined || n != n) {
+      if (n === undefined || n !== n) {
         n = 0;
-      } else if (n != 0 && n != Infinity && n != -Infinity) {  
-        n = (n > 0 || -1) * Math.floor(Math.abs(n));  
+      } else if (n !== 0 && n !== Infinity && n !== -Infinity) {
+        n = (n > 0 || -1) * Math.floor(Math.abs(n));
       }
 
       if (n < 0) {
@@ -364,19 +404,19 @@
         k++;
       } while (k < size);
 
-      return -1;  
+      return -1;
     };
 
-    list.lastIndexOf = function(searchElement, fromIndex) {
+    list.lastIndexOf = function (searchElement, fromIndex) {
       if (size === 0) {
         return -1;
       }
 
       var n = fromIndex;
-      if (n === undefined || n != n) {
+      if (n === undefined || n !== n) {
         n = 0;
-      } else if (n != 0 && n != Infinity && n != -Infinity) {  
-        n = (n > 0 || -1) * Math.floor(Math.abs(n));  
+      } else if (n !== 0 && n !== Infinity && n !== -Infinity) {
+        n = (n > 0 || -1) * Math.floor(Math.abs(n));
       }
 
       if (n < 0) {
@@ -411,10 +451,10 @@
         k--;
       } while (k >= 0);
 
-      return -1;  
+      return -1;
     };
 
-    list.slice = function(begin, end) {
+    list.slice = function (begin, end) {
       if (size === 0) {
         return create();
       }
@@ -422,7 +462,7 @@
       if (begin < 0) {
         begin = size + begin;
         if (begin < 0) {
-          begin = 0
+          begin = 0;
         }
       }
 
@@ -468,7 +508,7 @@
       return createFromBucketChain(newHead, end - begin);
     };
 
-    list.join = function(separator) {
+    list.join = function (separator) {
       if (size === 0) {
         return "";
       }
@@ -479,18 +519,18 @@
 
       var buffer = new Array(size);
 
-      list.forEach(function(e, i) {
+      list.forEach(function (e, i) {
         buffer[i] = e;
       });
 
       return buffer.join(separator);
     };
 
-    list.toString = function() {
+    list.toString = function () {
       return list.join(',');
     };
 
-    list.forEach = function(callback, thisArg) {
+    list.forEach = function (callback, thisArg) {
       // @see https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/forEach
       if (size === 0) {
         return;
@@ -502,8 +542,8 @@
 
       var O = Object(this);
 
-      if ({}.toString.call(callback) != "[object Function]") {
-        throw new TypeError( callback + " is not a function" );
+      if ({}.toString.call(callback) !== "[object Function]") {
+        throw new TypeError(callback + " is not a function");
       }
 
       var T;
@@ -521,7 +561,7 @@
       } while (bucket !== head);
     };
 
-    list.reverseForEach = function(callback, thisArg) {
+    list.reverseForEach = function (callback, thisArg) {
       // @see https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/forEach
       if (size === 0) {
         return;
@@ -533,8 +573,8 @@
 
       var O = Object(this);
 
-      if ({}.toString.call(callback) != "[object Function]") {
-        throw new TypeError( callback + " is not a function" );
+      if ({}.toString.call(callback) !== "[object Function]") {
+        throw new TypeError(callback + " is not a function");
       }
 
       var T;
@@ -560,48 +600,15 @@
         size = initialData.size;
         if (size === undefined) {
           size = 1;
-          for (var bucket = head.next; bucket !== head; bucket = bucket.next, size++) ;
+          var bucket;
+          for (bucket = head.next; bucket !== head; bucket = bucket.next) {
+            size++;
+          }
         }
       }
     }
 
     return list;
-  }
-
-  function arrayToBucketChain(array) {
-    if (array.length === 0) {
-      return null;
-    }
-
-    var head = { previous: null, next: null, target: array[0] };
-    var bucket = head;
-    for(var i=1; i<array.length; i++) {
-      bucket.next = { previous: bucket, next: null, target: array[i] };
-      bucket = bucket.next;
-    }
-
-    head.previous = bucket;
-    bucket.next = head;
-
-    return head;
-  }
-
-  function duplicateBucketChain(head) {
-    if (head === null) {
-      return null;
-    }
-
-    var newHead = { previous: null, next: null, target: head.target };
-    var newBucket = newHead;
-    for(var bucket = head.next; bucket != head; bucket = bucket.next) {
-      newBucket.next = { previous: newBucket, next: null, target: bucket.target };
-      newBucket = newBucket.next;
-    }
-
-    newHead.previous = newBucket;
-    newBucket.next = newHead;
-
-    return newHead;
   }
 
   function createFromBucketChain(head, size) {
@@ -610,11 +617,11 @@
     });
   }
 
-  exports.create = function(array) {
+  exports.create = function (array) {
     if (array === undefined || array.length === 0) {
       return create();
-    } else {
-      return createFromBucketChain(arrayToBucketChain(array));
     }
+
+    return createFromBucketChain(arrayToBucketChain(array));
   };
 })(typeof exports === 'undefined' ? this['algaeDoublyLinkedList']={} : exports);

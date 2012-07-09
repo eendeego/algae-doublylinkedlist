@@ -13,10 +13,12 @@
   "dependencies": {},
   "devDependencies": {
     "tap": "*",
-    "uglify-js": "*"
+    "uglify-js": "*",
+    "jslint": "*"
   },
   "scripts": {
     "test": "node node_modules/tap/bin/tap.js tests",
+    "jslint": "node node_modules/jslint/bin/jslint.js list.js",
     "minify": "node node_modules/uglify-js/bin/uglifyjs < list.js > list.min.js"
   }
 }
