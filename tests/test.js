@@ -473,3 +473,24 @@ tap.test("reverse iterating over a list", function(t) {
   t.equal(index, -1);
   t.end();
 });
+
+tap.test("mapping a list", function(t) {
+  var iterationSequence = [1, 2, 3];
+  var list = ll.create(iterationSequence);
+  var iteratedCollection;
+
+  var that = { test: '123' };
+
+  var index = 0;
+  var squares = list.map(function(elt, idx) {
+    t.equal(idx, index++, 'iteration index');
+    t.equal(elt, iterationSequence[idx], 'iteration element');
+    t.equal(this, that, 'iteration context (this)');
+    return elt * elt;
+  }, that);
+
+  t.equal(index, 3, 'list.map result as smae length');
+  t.equivalent(squares.toArray(), [1, 4, 9], 'list.map result');
+
+  t.end();
+});

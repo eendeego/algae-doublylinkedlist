@@ -98,7 +98,7 @@
       forEach : null,
       reverseForEach : null,
 
-      map : null, // TODO
+      map : null,
       reduce : null, // TODO
       reduceRight : null, // TODO
 
@@ -592,6 +592,48 @@
       } while (bucket.next !== head);
     };
 
+    list.map = function (callback, thisArg) {
+      // @see https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/map
+      var T, k, kValue, bucket, newHead, newBucket;
+
+      // if (this == null) {
+      //   throw new TypeError("this is null or not defined");
+      // }
+
+      if (size === 0) {
+        return create();
+      }
+
+      if ({}.toString.call(callback) !== "[object Function]") {
+        throw new TypeError(callback + " is not a function");
+      }
+
+      if (thisArg) {
+        T = thisArg;
+      }
+
+      bucket = head;
+      k = 0;
+      kValue = bucket.target;
+      newHead = { previous: null, next: null, target: callback.call(T, kValue, k, list) };
+      newBucket = newHead;
+      bucket = bucket.next;
+
+      while (bucket !== head) {
+        k++;
+        kValue = bucket.target;
+        newBucket.next = { previous: newBucket, next: null, target: callback.call(T, kValue, k, list) };
+        newBucket = newBucket.next;
+        bucket = bucket.next;
+      }
+
+      newBucket.next = newHead;
+      newHead.previous = newBucket;
+
+      return createFromBucketChain(newHead, size);
+    };
+
+
     if (initializer !== undefined) {
       var initialData = initializer(list);
 
@@ -607,6 +649,7 @@
         }
       }
     }
+
 
     return list;
   }
