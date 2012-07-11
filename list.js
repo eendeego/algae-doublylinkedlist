@@ -100,7 +100,7 @@
 
       map : null,
       reduce : null,
-      reduceRight : null, // TODO
+      reduceRight : null,
 
       some : null, // TODO
       every : null, // TODO
@@ -659,6 +659,42 @@
         curr = accumulator.call(undefined, curr, bucket.target, i, list);
         bucket = bucket.next;
         i++;
+      }
+
+      return curr;
+    };
+
+    list.reduceRight = function (accumulator, initialValue) {
+      // @see https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/ReduceRight
+      var i = size-1, curr, bucket;
+
+      if (typeof accumulator !== "function") {
+        // ES5 : "If IsCallable(callbackfn) is false, throw a TypeError exception."
+        throw new TypeError("First argument is not callable");
+      }
+
+      if (initialValue === undefined) {
+        if (size === 0) {
+          throw new TypeError("Array length is 0 and no second argument");
+        }
+        bucket = head.previous;
+
+        curr = bucket.target;
+        i--; // start accumulating at the penultimate element
+        bucket = bucket.previous;
+      } else {
+        if (size === 0) {
+          return initialValue;
+        }
+
+        curr = initialValue;
+        bucket = head.previous;
+      }
+
+      while (i >= 0) {
+        curr = accumulator.call(undefined, curr, bucket.target, i, list);
+        bucket = bucket.previous;
+        i--;
       }
 
       return curr;

@@ -534,3 +534,44 @@ tap.test("reducing a list", function(t) {
 
   t.end();
 });
+
+tap.test("right reducing a list", function(t) {
+  var reduceTests = [
+      { setup: [[1, 2, 3, 4], 0]     , testLoop: [{p:0,c:4,i:3}, {p:4,c:3,i:2}, {p:7,c:2,i:1}, {p:9,c:1,i:0}], sum: 10 },
+      { setup: [[1, 2], 0]           , testLoop: [{p:0,c:2,i:1}, {p:2,c:1,i:0}], sum: 3 },
+      { setup: [[1], 0]              , testLoop: [{p:0,c:1,i:0}], sum: 1 },
+      { setup: [[], 0]               , testLoop: [], sum: 0 },
+      { setup: [[1, 2, 3], undefined], testLoop: [{p:3,c:2,i:1}, {p:5,c:1,i:0}], sum: 6 },
+      { setup: [[1, 2], undefined]   , testLoop: [{p:2,c:1,i:0}], sum: 3 },
+      { setup: [[1], undefined]      , testLoop: [], sum: 1 },
+    ];
+  var list;
+
+  reduceTests.forEach(function(iterationSequence, testSet) {
+    list = ll.create(iterationSequence.setup[0]);
+
+    var index = 0;
+    var outOfBandSum = 0;
+    var sum = list.reduceRight(function(previous, current, idx, context) {
+      t.pass('reduceRight(' + testSet + '): callback (' + index + ')')
+      t.equal(previous, iterationSequence.testLoop[index].p, 'reduceRight(' + testSet + '): callback (' + index + ') previous parameter')
+      t.equal(current , iterationSequence.testLoop[index].c, 'reduceRight(' + testSet + '): callback (' + index + ') current parameter');
+      t.equal(idx     , iterationSequence.testLoop[index].i, 'reduceRight(' + testSet + '): callback (' + index + ') index parameter');
+      t.equal(context , list , 'reduceRight: callback context (list)');
+      index++;
+      outOfBandSum += current;
+      return previous + current;
+    }, iterationSequence.setup[1]);
+
+    t.equal(sum, iterationSequence.sum, 'reduceRight can calculate sums');
+  });
+
+  try {
+    ll.create().reduceRight(function() {});
+    t.fail('right reducing an empty list should fail.');
+  } catch (e) {
+    t.type(e, "TypeError", 'right reducing an empty list throws type error.');
+  }
+
+  t.end();
+});
