@@ -99,7 +99,7 @@
       reverseForEach : null,
 
       map : null,
-      reduce : null, // TODO
+      reduce : null,
       reduceRight : null, // TODO
 
       some : null, // TODO
@@ -631,6 +631,37 @@
       newHead.previous = newBucket;
 
       return createFromBucketChain(newHead, size);
+    };
+
+    list.reduce = function (accumulator, initialValue) {
+      // @see https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/Reduce
+      var i = 0, curr, bucket;
+
+      if (typeof accumulator !== "function") {
+        // ES5 : "If IsCallable(callbackfn) is false, throw a TypeError exception."
+        throw new TypeError("First argument is not callable");
+      }
+
+      bucket = head;
+
+      if (initialValue === undefined) {
+        if (size === 0) {
+          throw new TypeError("Array length is 0 and no second argument");
+        }
+        curr = bucket.target;
+        i = 1; // start accumulating at the second element
+        bucket = bucket.next;
+      } else {
+        curr = initialValue;
+      }
+
+      while (i < size) {
+        curr = accumulator.call(undefined, curr, bucket.target, i, list);
+        bucket = bucket.next;
+        i++;
+      }
+
+      return curr;
     };
 
 

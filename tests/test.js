@@ -494,3 +494,43 @@ tap.test("mapping a list", function(t) {
 
   t.end();
 });
+
+tap.test("reducing a list", function(t) {
+  var reduceTests = [
+      { setup: [[1, 2, 3, 4], 0]     , testLoop: [{p:0,c:1,i:0}, {p:1,c:2,i:1}, {p:3,c:3,i:2}, {p:6,c:4,i:3}], sum: 10 },
+      { setup: [[1, 2], 0]           , testLoop: [{p:0,c:1,i:0}, {p:1,c:2,i:1}], sum: 3 },
+      { setup: [[1], 0]              , testLoop: [{p:0,c:1,i:0}], sum: 1 },
+      { setup: [[], 0]               , testLoop: [], sum: 0 },
+      { setup: [[1, 2, 3], undefined], testLoop: [{p:1,c:2,i:1}, {p:3,c:3,i:2}], sum: 6 },
+      { setup: [[1, 2], undefined]   , testLoop: [{p:1,c:2,i:1}], sum: 3 },
+      { setup: [[1], undefined]      , testLoop: [], sum: 1 },
+    ];
+  var list;
+
+  reduceTests.forEach(function(iterationSequence, testSet) {
+    list = ll.create(iterationSequence.setup[0]);
+
+    var index = 0;
+    var outOfBandSum = 0;
+    var sum = list.reduce(function(previous, current, idx, context) {
+      t.equal(previous, iterationSequence.testLoop[index].p, 'reduce(' + testSet + '): callback (' + index + ') previous parameter')
+      t.equal(current , iterationSequence.testLoop[index].c, 'reduce(' + testSet + '): callback (' + index + ') current parameter');
+      t.equal(idx     , iterationSequence.testLoop[index].i, 'reduce(' + testSet + '): callback (' + index + ') index parameter');
+      t.equal(context , list , 'reduce: callback context (list)');
+      index++;
+      outOfBandSum += current;
+      return previous + current;
+    }, iterationSequence.setup[1]);
+
+    t.equal(sum, iterationSequence.sum, 'reduce can calculate sums');
+  });
+
+  try {
+    ll.create().reduce(function() {});
+    t.fail('reducing an empty list should fail.');
+  } catch (e) {
+    t.type(e, "TypeError", 'reducing an empty list throws type error.');
+  }
+
+  t.end();
+});
