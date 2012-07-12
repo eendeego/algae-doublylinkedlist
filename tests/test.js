@@ -575,3 +575,62 @@ tap.test("right reducing a list", function(t) {
 
   t.end();
 });
+
+tap.test("testing for some elements", function(t) {
+  var someTests = [
+      { setup: [[1, 2, 3, 4], function(e) { return e % 2 === 0 }], testLoop: [{e:1,i:0}, {e:2,i:1}], result: true },
+      { setup: [[1, 2, 3, 4], function(e) { return e > 5 }], testLoop: [{e:1,i:0}, {e:2,i:1}, {e:3,i:2}, {e:4,i:3}], result: false },
+      { setup: [[], function(e) { return true }, {}], testLoop: [], result: false },
+    ];
+  var list;
+
+  someTests.forEach(function(iterationSequence, testSet) {
+    list = ll.create(iterationSequence.setup[0]);
+
+    var index = 0;
+    var result = list.some(function(element, idx, lst) {
+      t.equal(element , iterationSequence.testLoop[index].e, 'some(' + testSet + '): callback (' + index + ') element parameter');
+      t.equal(idx     , iterationSequence.testLoop[index].i, 'some(' + testSet + '): callback (' + index + ') index parameter');
+      t.equal(lst     , list , 'some: callback context (list)');
+      if (iterationSequence.setup[2]) {
+        t.equal(this, iterationSequence.setup[2], 'some(' + testSet + '): callback (' + index + ') this');
+      }
+      index++;
+      return iterationSequence.setup[1](element, idx, lst);
+    }, iterationSequence.setup[2]);
+
+    t.equal(result, iterationSequence.result, 'some result');
+  });
+
+  t.end();
+});
+
+tap.test("testing for every elements", function(t) {
+  var everyTests = [
+      { setup: [[4, 3, 2, 1], function(e) { return e % 2 === 0 }], testLoop: [{e:4,i:0}, {e:3,i:1}], result: false },
+      { setup: [[1, 2, 3, 4], function(e) { return e < 3 }], testLoop: [{e:1,i:0}, {e:2,i:1}, {e:3,i:2}], result: false },
+      { setup: [[1, 2, 3, 4], function(e) { return e < 5 }], testLoop: [{e:1,i:0}, {e:2,i:1}, {e:3,i:2}, {e:4,i:3}], result: true },
+      { setup: [[], function(e) { return true }, {}], testLoop: [], result: false },
+    ];
+  var list;
+
+  everyTests.forEach(function(iterationSequence, testSet) {
+    list = ll.create(iterationSequence.setup[0]);
+
+    var index = 0;
+    var result = list.every(function(element, idx, lst) {
+      t.equal(element , iterationSequence.testLoop[index].e, 'every(' + testSet + '): callback (' + index + ') element parameter');
+      t.equal(idx     , iterationSequence.testLoop[index].i, 'every(' + testSet + '): callback (' + index + ') index parameter');
+      t.equal(lst     , list , 'every: callback context (list)');
+      if (iterationSequence.setup[2]) {
+        t.equal(this, iterationSequence.setup[2], 'every(' + testSet + '): callback (' + index + ') this');
+      }
+      index++;
+      return iterationSequence.setup[1](element, idx, lst);
+    }, iterationSequence.setup[2]);
+
+    t.equal(result, iterationSequence.result, 'every(' + testSet + '): result');
+  });
+
+  t.end();
+});

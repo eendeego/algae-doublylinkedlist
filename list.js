@@ -102,8 +102,8 @@
       reduce : null,
       reduceRight : null,
 
-      some : null, // TODO
-      every : null, // TODO
+      some : null,
+      every : null,
 
       filter : null // TODO
     };
@@ -698,6 +698,74 @@
       }
 
       return curr;
+    };
+
+    list.some = function (callback, thisArg) {
+      // @see https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/map
+      // @see https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/some
+      var T, k, kValue, bucket, newHead, newBucket;
+
+      // if (this == null) {
+      //   throw new TypeError("this is null or not defined");
+      // }
+
+      if (size === 0) {
+        return false;
+      }
+
+      if ({}.toString.call(callback) !== "[object Function]") {
+        throw new TypeError(callback + " is not a function");
+      }
+
+      if (thisArg) {
+        T = thisArg;
+      }
+
+      bucket = head;
+      k = 0;
+
+      do {
+        if (callback.call(T, bucket.target, k, list))
+          return true;
+        bucket = bucket.next;
+        k++;
+      } while (bucket !== head);
+
+      return false;
+    };
+
+    list.every = function (callback, thisArg) {
+      // @see https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/map
+      // @see https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/every
+      var T, k, kValue, bucket, newHead, newBucket;
+
+      // if (this == null) {
+      //   throw new TypeError("this is null or not defined");
+      // }
+
+      if (size === 0) {
+        return false;
+      }
+
+      if ({}.toString.call(callback) !== "[object Function]") {
+        throw new TypeError(callback + " is not a function");
+      }
+
+      if (thisArg) {
+        T = thisArg;
+      }
+
+      bucket = head;
+      k = 0;
+
+      do {
+        if (!callback.call(T, bucket.target, k, list))
+          return false;
+        bucket = bucket.next;
+        k++;
+      } while (bucket !== head);
+
+      return true;
     };
 
 
