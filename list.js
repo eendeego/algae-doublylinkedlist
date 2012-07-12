@@ -105,7 +105,7 @@
       some : null,
       every : null,
 
-      filter : null // TODO
+      filter : null
     };
 
     list.isEmpty = function () {
@@ -766,6 +766,43 @@
       } while (bucket !== head);
 
       return true;
+    };
+
+    list.filter = function (callback, thisArg) {
+      // @see https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/map
+      // @see https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/filter
+      var T, k, kValue, bucket, result;
+
+      // if (this == null) {
+      //   throw new TypeError("this is null or not defined");
+      // }
+
+      result = create();
+
+      if (size === 0) {
+        return result;
+      }
+
+      if ({}.toString.call(callback) !== "[object Function]") {
+        throw new TypeError(callback + " is not a function");
+      }
+
+      if (thisArg) {
+        T = thisArg;
+      }
+
+      bucket = head;
+      k = 0;
+      do {
+        kValue = bucket.target;
+        if (callback.call(T, kValue, k, list)) {
+          result.push(kValue);
+        }
+        bucket = bucket.next;
+        k++;
+      } while (bucket !== head);
+
+      return result;
     };
 
 

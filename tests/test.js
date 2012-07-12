@@ -634,3 +634,34 @@ tap.test("testing for every elements", function(t) {
 
   t.end();
 });
+
+tap.test("filtering elements", function(t) {
+  var everyTests = [
+      { setup: [[4, 3, 2, 1], function(e) { return e % 2 === 0 }], testLoop: [{e:4,i:0}, {e:3,i:1}, {e:2,i:2}, {e:1,i:3}], result: [4,2] },
+      { setup: [[1, 2, 3, 4], function(e) { return e < 3 }], testLoop: [{e:1,i:0}, {e:2,i:1}, {e:3,i:2}, {e:4,i:3}], result: [1,2] },
+      { setup: [[1, 2, 3, 4], function(e) { return e < 5 }], testLoop: [{e:1,i:0}, {e:2,i:1}, {e:3,i:2}, {e:4,i:3}], result: [1,2,3,4] },
+      { setup: [[], function(e) { return true }, {}], testLoop: [], result: [] },
+    ];
+  var list;
+
+  everyTests.forEach(function(iterationSequence, testSet) {
+    list = ll.create(iterationSequence.setup[0]);
+
+    var index = 0;
+    var result = list.filter(function(element, idx, lst) {
+      t.equal(element , iterationSequence.testLoop[index].e, 'filter(' + testSet + '): callback (' + index + ') element parameter');
+      t.equal(idx     , iterationSequence.testLoop[index].i, 'filter(' + testSet + '): callback (' + index + ') index parameter');
+      t.equal(lst     , list , 'filter: callback context (list)');
+      if (iterationSequence.setup[2]) {
+        t.equal(this, iterationSequence.setup[2], 'filter(' + testSet + '): callback (' + index + ') this');
+      }
+      index++;
+      return iterationSequence.setup[1](element, idx, lst);
+    }, iterationSequence.setup[2]);
+
+    t.equivalent(result.toArray(), iterationSequence.result, 'filter(' + testSet + '): result');
+  });
+
+  t.end();
+});
+
