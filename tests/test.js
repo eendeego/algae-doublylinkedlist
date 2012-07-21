@@ -1,5 +1,5 @@
 var tap  = require('tap');
-var ll = require('../list');
+var ll = require('../lib/list');
 
 tap.test("new linked list is empty", function(t) {
   var list = ll.create();

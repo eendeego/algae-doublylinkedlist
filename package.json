@@ -9,7 +9,7 @@
   "engines": {
     "node": ">= 0.6.0"
   },
-  "main": "./list",
+  "main": "lib/list",
   "dependencies": {},
   "devDependencies": {
     "tap": "*",
@@ -18,7 +18,7 @@
   },
   "scripts": {
     "test": "node node_modules/tap/bin/tap.js tests",
-    "jslint": "node node_modules/jslint/bin/jslint.js list.js",
-    "minify": "node node_modules/uglify-js/bin/uglifyjs < list.js > list.min.js"
+    "jslint": "node node_modules/jslint/bin/jslint.js lib/list.js",
+    "minify": "node node_modules/uglify-js/bin/uglifyjs < lib/list.js > lib/list.min.js"
   }
 }
