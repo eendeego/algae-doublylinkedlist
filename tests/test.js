@@ -38,6 +38,53 @@ tap.test("creating a list with an array", function(t) {
   t.end();
 });
 
+tap.test("fetching elements from the list", function(t) {
+  var list;
+
+  list = ll.create([]);
+  t.equal(list.get(  0), undefined, 'Fetching first element from an empty list.');
+  t.equal(list.get( -1), undefined, 'Fetching last element from an empty list.');
+  t.equal(list.get(100), undefined, 'Fetching any element from an empty list.');
+
+  list = ll.create([0,1,2,3]);
+  t.equal(list.get( 0), 0, 'Fetching an element from a list');
+  t.equal(list.get( 1), 1, 'Fetching an element from a list');
+  t.equal(list.get(-2), 2, 'Fetching an element from a list');
+  t.equal(list.get(-1), 3, 'Fetching an element from a list');
+
+  t.equal(list.first      (), 0, 'Fetching an element from a list');
+  t.equal(list.second     (), 1, 'Fetching an element from a list');
+  t.equal(list.penultimate(), 2, 'Fetching an element from a list');
+  t.equal(list.last       (), 3, 'Fetching an element from a list');
+
+  t.end();
+});
+
+tap.test("setting elements on the list", function(t) {
+  var list;
+
+  list = ll.create([]);
+  t.equal(list.set(  0, 3.14), undefined, 'Setting first element from an empty list.');
+  t.equal(list.length, 0, 'Setting an unexisting index doesn\'t grow the list');
+  t.equal(list.set( -1, 3.14), undefined, 'Setting last element from an empty list.');
+  t.equal(list.length, 0, 'Setting an unexisting index doesn\'t grow the list');
+  t.equal(list.set(100, 3.14), undefined, 'Setting any element from an empty list.');
+  t.equal(list.length, 0, 'Setting an unexisting index doesn\'t grow the list');
+
+  list = ll.create([0,1,2,3]);
+  t.equal(list.set( 0, 3), 0, 'Setting an element from a list returns the old value');
+  t.equal(list.set( 1, 2), 1, 'Setting an element from a list returns the old value');
+  t.equal(list.set(-2, 1), 2, 'Setting an element from a list returns the old value');
+  t.equal(list.set(-1, 0), 3, 'Setting an element from a list returns the old value');
+
+  t.equal(list.first      (), 3, 'Fetching an element from a list');
+  t.equal(list.second     (), 2, 'Fetching an element from a list');
+  t.equal(list.penultimate(), 1, 'Fetching an element from a list');
+  t.equal(list.last       (), 0, 'Fetching an element from a list');
+
+  t.end();
+});
+
 tap.test("pushing elements to the list", function(t) {
   var list = ll.create();
 
