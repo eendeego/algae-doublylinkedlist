@@ -27,6 +27,82 @@ It's purpose is not to provide a "better than native" data structure.
       myList.push(1.618);
     </script>
 
+## Documentation
+
+This class implements the circular list functionality, and the JS Array's as much as possible.
+
+The main difference from Array's contract is that no function here uses varargs. The added clarity compensates for a little more verbose code.
+
+All functions are documented with their Big O notation weight (cpu and memory if apropriate).
+
+All functions that need to iterate to a specific index use the shortest path by going forward or backward through the list.
+
+### Constructor
+
+    create([array])
+
+Complexity: O(array.length)
+
+Creates a list with the same elements as the passed array.
+
+### Properties
+
+    isArray()
+
+Complexity: O(1)
+
+Returns ```false```.
+
+    isList()
+
+Complexity: O(1)
+
+Returns ```true```.
+
+    size()
+    length
+
+Complexity: O(1)
+
+Returns the list's element count.
+
+    isEmpty()
+
+Complexity: O(1)
+
+Returns ```true``` if the list has no elements.
+
+    get(index)
+
+Complexity: O(size/2); index < size / 2 ? Θ(index) : Θ(size-index) [index here is the actual absolute index]
+
+Returns element at index ```index``` of the list. Use a negative ```index``` to start from the right.
+
+Fetching an index outside the list results in ```undefined```.
+
+    first()
+    last()
+    second()
+    penultimate()
+
+Complexity: O(1)
+
+Returns _nth_ list element.
+
+Fetching an from a list with insufficient elements results in ```undefined```.
+
+### Mutators
+
+(TO DO)
+
+### Accessor
+
+(TO DO)
+
+### Iteration
+
+(TO DO)
+
 ## Who
 algae-doublylinkedlist is a project by [Luis Reis](https://twitter.com/luismreis), with support from [other awesome people](https://github.com/luismreis/algae-doublylinkedlist/graphs/contributors)
 
